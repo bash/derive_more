@@ -1977,3 +1977,21 @@ mod generic {
         }
     }
 }
+
+// See: https://github.com/JelteF/derive_more/issues/301
+mod complex_enum_syntax {
+    #[cfg(not(feature = "std"))]
+    use alloc::{boxed::Box, format};
+
+    use derive_more::Debug;
+
+    #[derive(Debug)]
+    enum Enum {
+        A = if cfg!(unix) { 2 } else { 3 },
+    }
+
+    #[test]
+    fn assert() {
+        assert_eq!(format!("{:?}", Enum::A), "A");
+    }
+}

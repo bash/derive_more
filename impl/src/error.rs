@@ -37,17 +37,24 @@ pub fn expand(
     };
 
     let source = source.map(|source| {
+        // Not using `#[inline]` here on purpose, since this is almost never part
+        // of a hot codepath.
         quote! {
-            fn source(&self) -> Option<&(dyn ::derive_more::Error + 'static)> {
-                use ::derive_more::__private::AsDynError;
+            fn source(&self) -> Option<&(dyn derive_more::Error + 'static)> {
+                use derive_more::__private::AsDynError;
                 #source
             }
         }
     });
 
     let provide = provide.map(|provide| {
+        // Not using `#[inline]` here on purpose, since this is almost never part
+        // of a hot codepath.
         quote! {
-            fn provide<'_request>(&'_request self, request: &mut ::core::error::Request<'_request>) {
+            fn provide<'_request>(
+                &'_request self,
+                request: &mut derive_more::core::error::Request<'_request>,
+            ) {
                 #provide
             }
         }
@@ -61,7 +68,8 @@ pub fn expand(
             &generics,
             quote! {
                 where
-                    #ident #ty_generics: ::core::fmt::Debug + ::core::fmt::Display
+                    #ident #ty_generics: derive_more::core::fmt::Debug
+                                         + derive_more::core::fmt::Display
             },
         );
     }
@@ -71,8 +79,12 @@ pub fn expand(
         generics = utils::add_extra_where_clauses(
             &generics,
             quote! {
-                where
-                    #(#bounds: ::core::fmt::Debug + ::core::fmt::Display + ::derive_more::Error + 'static),*
+                where #(
+                    #bounds: derive_more::core::fmt::Debug
+                             + derive_more::core::fmt::Display
+                             + derive_more::Error
+                             + 'static
+                ),*
             },
         );
     }
@@ -81,7 +93,7 @@ pub fn expand(
 
     let render = quote! {
         #[automatically_derived]
-        impl #impl_generics ::derive_more::Error for #ident #ty_generics #where_clause {
+        impl #impl_generics derive_more::Error for #ident #ty_generics #where_clause {
             #source
             #provide
         }
@@ -205,7 +217,7 @@ impl<'input, 'state> ParsedFields<'input, 'state> {
         let source_provider = self.source.map(|source| {
             let source_expr = &self.data.members[source];
             quote! {
-                ::derive_more::Error::provide(&#source_expr, request);
+                derive_more::Error::provide(&#source_expr, request);
             }
         });
         let backtrace_provider = self
@@ -235,7 +247,7 @@ impl<'input, 'state> ParsedFields<'input, 'state> {
                 let pattern = self.data.matcher(&[source], &[quote! { source }]);
                 Some(quote! {
                     #pattern => {
-                        ::derive_more::Error::provide(source, request);
+                        derive_more::Error::provide(source, request);
                     }
                 })
             }
@@ -247,7 +259,7 @@ impl<'input, 'state> ParsedFields<'input, 'state> {
                 Some(quote! {
                     #pattern => {
                         request.provide_ref::<::std::backtrace::Backtrace>(backtrace);
-                        ::derive_more::Error::provide(source, request);
+                        derive_more::Error::provide(source, request);
                     }
                 })
             }
