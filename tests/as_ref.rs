@@ -23,7 +23,7 @@ struct SingleFieldForward(Vec<i32>);
 #[test]
 fn single_field_forward() {
     let item = SingleFieldForward(vec![]);
-    let _: &[i32] = (&item).as_ref();
+    let _: &[i32] = item.as_ref();
 }
 
 #[derive(AsRef)]

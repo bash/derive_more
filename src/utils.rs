@@ -259,6 +259,7 @@ pub enum DeriveType {
     Enum,
 }
 
+#[allow(dead_code)]
 pub struct State<'input> {
     pub input: &'input DeriveInput,
     pub trait_name: &'static str,
@@ -789,6 +790,7 @@ impl<'input> State<'input> {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct SingleFieldData<'input, 'state> {
     pub input_type: &'input Ident,
@@ -828,6 +830,7 @@ pub struct MultiFieldData<'input, 'state> {
     pub state: &'state State<'input>,
 }
 
+#[allow(dead_code)]
 pub struct MultiVariantData<'input, 'state> {
     pub input_type: &'input Ident,
     pub variants: Vec<&'input Variant>,
@@ -1190,7 +1193,7 @@ pub fn get_if_type_parameter_used_in_type(
     if is_type_parameter_used_in_type(type_parameters, ty) {
         match ty {
             syn::Type::Reference(syn::TypeReference { elem: ty, .. }) => {
-                Some((&**ty).clone())
+                Some((**ty).clone())
             }
             ty => Some(ty.clone()),
         }

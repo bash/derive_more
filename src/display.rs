@@ -707,7 +707,7 @@ impl<'a, 'b> State<'a, 'b> {
                     if fields_type_params.contains_key(arg) {
                         bounds
                             .entry(fields_type_params[arg].clone())
-                            .or_insert_with(HashSet::default)
+                            .or_default()
                             .insert(trait_name_to_trait_bound(pl.trait_name));
                     }
                 }
@@ -799,7 +799,7 @@ mod regex_maybe_placeholder_spec {
     #[test]
     fn parses_placeholders_and_omits_escaped() {
         let fmt_string = "{}, {:?}, {{}}, {{{1:0$}}}";
-        let placeholders: Vec<_> = crate::parsing::all_placeholders(&fmt_string)
+        let placeholders: Vec<_> = crate::parsing::all_placeholders(fmt_string)
             .into_iter()
             .flatten()
             .collect();
@@ -872,7 +872,7 @@ mod placeholder_parse_fmt_string_spec {
     fn indicates_position_and_trait_name_for_each_fmt_placeholder() {
         let fmt_string = "{},{:?},{{}},{{{1:0$}}}-{2:.1$x}{0:#?}{:width$}";
         assert_eq!(
-            Placeholder::parse_fmt_string(&fmt_string),
+            Placeholder::parse_fmt_string(fmt_string),
             vec![
                 Placeholder {
                     position: 0,
