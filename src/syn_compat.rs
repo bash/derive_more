@@ -109,7 +109,10 @@ fn parse_nested_meta(meta: Meta) -> Result<ParsedMeta> {
         Meta::Path(path) => Ok(ParsedMeta::Path(path)),
         Meta::NameValue(name_value) => Ok(ParsedMeta::NameValue(name_value)),
         Meta::List(list) => {
-            let MacroDelimiter::Paren(paren_token) = list.delimiter else {
+            let paren_token = if let MacroDelimiter::Paren(paren_token) = list.delimiter
+            {
+                paren_token
+            } else {
                 return Err(syn::Error::new(
                     list.delimiter.span().span(),
                     "Expected paren",
@@ -149,7 +152,7 @@ fn parse_meta_path(input: ParseStream) -> Result<Path> {
     })
 }
 
-pub fn parse_meta_after_path(path: Path, input: ParseStream) -> Result<ParsedMeta> {
+fn parse_meta_after_path(path: Path, input: ParseStream) -> Result<ParsedMeta> {
     if input.peek(token::Paren) {
         parse_meta_list_after_path(path, input).map(ParsedMeta::List)
     } else if input.peek(Token![=]) {
