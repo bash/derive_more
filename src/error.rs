@@ -32,7 +32,7 @@ pub fn expand(
         })
         .collect();
 
-    let (bounds, source, backtrace) = match state.derive_type {
+    let (bounds, source, _backtrace) = match state.derive_type {
         DeriveType::Named | DeriveType::Unnamed => render_struct(&type_params, &state)?,
         DeriveType::Enum => render_enum(&type_params, &state)?,
     };
@@ -41,14 +41,6 @@ pub fn expand(
         quote! {
             fn source(&self) -> Option<&(dyn ::std::error::Error + 'static)> {
                 #source
-            }
-        }
-    });
-
-    let backtrace = backtrace.map(|backtrace| {
-        quote! {
-            fn backtrace(&self) -> Option<&::std::backtrace::Backtrace> {
-                #backtrace
             }
         }
     });
@@ -82,7 +74,6 @@ pub fn expand(
     let render = quote! {
         impl#impl_generics ::std::error::Error for #ident#ty_generics #where_clause {
             #source
-            #backtrace
         }
     };
 

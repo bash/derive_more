@@ -47,10 +47,8 @@ ignored for one of these methods by using `#[error(not(backtrace))]` or
 # Example usage
 
 ```rust
-#![feature(backtrace)]
 # #[macro_use] extern crate derive_more;
 # use std::error::Error as _;
-use std::backtrace::Backtrace;
 
 // std::error::Error requires std::fmt::Debug and std::fmt::Display,
 // so we can also use derive_more::Display for fully declarative
@@ -75,13 +73,6 @@ struct Tuple(Simple);
 #[derive(Default, Debug, Display, Error)]
 struct WithoutSource(#[error(not(source))] i32);
 
-#[derive(Debug, Display, Error)]
-#[display(fmt="An error with a backtrace")]
-struct WithSourceAndBacktrace {
-    source: Simple,
-    backtrace: Backtrace,
-}
-
 
 // derive_more::From fits nicely into this pattern as well
 #[derive(Debug, Display, Error, From)]
@@ -100,17 +91,10 @@ enum CompoundError {
 
 fn main() {
     assert!(Simple.source().is_none());
-    assert!(Simple.backtrace().is_none());
     assert!(WithSource::default().source().is_some());
     assert!(WithExplicitSource::default().source().is_some());
     assert!(Tuple::default().source().is_some());
     assert!(WithoutSource::default().source().is_none());
-    let with_source_and_backtrace = WithSourceAndBacktrace{
-        source: Simple,
-        backtrace: Backtrace::capture(),
-    };
-    assert!(with_source_and_backtrace.source().is_some());
-    assert!(with_source_and_backtrace.backtrace().is_some());
 
     assert!(CompoundError::Simple.source().is_none());
     assert!(CompoundError::from(Simple).source().is_some());
