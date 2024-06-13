@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        toolchain: [stable, nightly, 1.36.0]
+        toolchain: [stable, nightly, 1.60.0]
         os: [ubuntu, macOS, windows]
     steps:
       - uses: actions/checkout@v2
@@ -112,14 +112,11 @@ jobs:
 
 
   msrv:
-    # TODO: Use MSRV once it understands new `Cargo.lock` format.
-    # name: MSRV
-    name: Minimal crates versions
+    name: MSRV
     strategy:
       fail-fast: false
       matrix:
-        # msrv: ["1.36.0"]
-        msrv: [stable]
+        msrv: ["1.60.0"]
         os: [ubuntu, macOS, windows]
     runs-on: ${{ matrix.os }}-latest
     steps:
